@@ -1,7 +1,11 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import os
 import math
-df = pd.read_csv('../results.csv')
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+csv_path = os.path.join(os.path.dirname(__file__), '..', 'results.csv')
+df = pd.read_csv(csv_path)
 
 plt.figure(figsize=(10, 6))
 for (alg, inp), group in df.groupby(['algorithm', 'input']):
@@ -30,10 +34,11 @@ plt.close()
 
 plt.figure(figsize=(10, 6))
 for (alg, inp), group in df.groupby(['algorithm', 'input']):
+    n_vals = group['n'].astype(float)
     if alg == 'QuickSelect':
-        ratio = group['comparisons'] / group['n']
+        ratio = group['comparisons'] / n_vals
     else:
-        ratio = group['comparisons'] / (group['n'] * group['n'].apply(lambda x: math.log2(x)))
+        ratio = group['comparisons'] / (n_vals * np.log2(n_vals))
     plt.plot(group['n'], ratio, marker='o', label=f"{alg} ({inp})")
 plt.xscale('log')
 plt.xlabel('Array Size (n)')
@@ -43,3 +48,4 @@ plt.legend()
 plt.grid(True)
 plt.savefig('ratio_vs_n.png')
 plt.close()
+print("Plots successfully generated and saved in plots/ directory!")
